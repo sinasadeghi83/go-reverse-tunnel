@@ -3,7 +3,7 @@ package example
 import (
 	"log"
 
-	"github.com/sinasadeghi83/go-reverse-http-tunnel/server"
+	"github.com/sinasadeghi83/go-reverse-tunnel/server"
 )
 
 func main() {
