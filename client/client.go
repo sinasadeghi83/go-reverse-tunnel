@@ -73,6 +73,7 @@ func handleTunnel(port string, host string) {
 	tunnelSemaphore <- struct{}{}        // Acquire a slot
 	defer func() { <-tunnelSemaphore }() // Release the slot
 
+	time.Sleep(100 * time.Millisecond)
 	srcConn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%s", serverHost, port), 10*time.Second)
 	if err != nil {
 		log.Printf("Unable to connect to server tunnel: %s", err)

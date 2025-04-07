@@ -119,17 +119,21 @@ func notifyClient(w http.ResponseWriter, r *http.Request) {
 	conn := conns[username]
 	mu.Unlock()
 
-	ln, err := net.Listen("tcp", ":0")
-	if err != nil {
-		log.Printf("could not find a free port: %v", err)
-		return
+	var ln net.Listener
+	for port := 30000; port < 40000; port++ {
+		var err error
+		ln, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
+		if err == nil {
+			// Successfully bound to port
+			break
+		}
 	}
 	defer ln.Close()
 	lnAddr := ln.Addr().(*net.TCPAddr)
 
-	log.Printf("Establishing tunnel for username '%s' to host '%s'", username, r.Host)
+	log.Printf("Establishing tunnel for username '%s' to host '%s' through port '%d'", username, r.Host, lnAddr.Port)
 
-	_, err = conn.Write([]byte(fmt.Sprintf("port %d connect %s\n", lnAddr.Port, r.Host)))
+	_, err := conn.Write([]byte(fmt.Sprintf("port %d connect %s\n", lnAddr.Port, r.Host)))
 	if err != nil {
 		http.Error(w, "could not transfer data with client", http.StatusNotFound)
 		log.Println("could not transfer data with client", err)
