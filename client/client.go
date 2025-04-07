@@ -22,12 +22,15 @@ var (
 	tunnelSemaphore = make(chan struct{}, 100) // Limit to 10 concurrent tunnels
 )
 
+var strAddr, username, password, serverHost string
+
 func main() {
 	if len(os.Args) < 4 {
 		log.Fatal("not enough arguments given")
 	}
 
-	strAddr, username, password := os.Args[1], os.Args[2], os.Args[3]
+	strAddr, username, password = os.Args[1], os.Args[2], os.Args[3]
+	serverHost = strings.Split(strAddr, ":")[0]
 
 	conn, err := net.Dial("tcp", strAddr)
 	if err != nil {
@@ -61,7 +64,7 @@ func main() {
 			continue
 		}
 
-		log.Printf("Connecting to %s", data[3])
+		log.Printf("Connecting to %s from server port %s", data[3], data[1])
 		go handleTunnel(data[1], data[3])
 	}
 }
@@ -70,7 +73,7 @@ func handleTunnel(port string, host string) {
 	tunnelSemaphore <- struct{}{}        // Acquire a slot
 	defer func() { <-tunnelSemaphore }() // Release the slot
 
-	srcConn, err := net.DialTimeout("tcp", "localhost:"+port, 10*time.Second)
+	srcConn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%s", serverHost, port), 10*time.Second)
 	if err != nil {
 		log.Printf("Unable to connect to server tunnel: %s", err)
 		return

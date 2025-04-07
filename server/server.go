@@ -119,7 +119,7 @@ func notifyClient(w http.ResponseWriter, r *http.Request) {
 	conn := conns[username]
 	mu.Unlock()
 
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	ln, err := net.Listen("tcp", "0.0.0.0:0")
 	if err != nil {
 		log.Printf("could not find a free port: %v", err)
 		return
