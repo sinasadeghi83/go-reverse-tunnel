@@ -64,6 +64,7 @@ func handleClientConnection(conn net.Conn) {
 	credParams := strings.Split(strings.TrimSpace(credentials), ":")
 	if len(credParams) < 2 {
 		log.Printf("Error decoding credentials: %s", err)
+		return
 	}
 
 	username, _ := credParams[0], credParams[1]
